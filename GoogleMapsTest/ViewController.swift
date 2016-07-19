@@ -19,9 +19,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     var arrayWithMarkerObjects : [AnyObject] = []
     var mapView : GMSMapView!
     var arrayP : [PlaceMarker] = []
-
-
-    
     var lattitude : Double = 0
     var longitude : Double = 0
     var startSearch : UIButton = UIButton()
@@ -41,13 +38,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
             locationManager.startUpdatingLocation()
         }
     
-        self.startSearch = UIButton(frame: CGRectMake(0, self.view.frame.size.height/1.2, 130, 30))
+        self.startSearch = UIButton(frame: CGRectMake(0, self.view.frame.size.height/10, 130, 30))
         startSearch.setTitle("Search", forState: .Normal)
         startSearch.setTitleColor(UIColor.blackColor(), forState: .Normal)
         startSearch.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
         startSearch.addTarget(self, action:#selector(startSearchPressed), forControlEvents: .TouchUpInside)
     
-        self.textField = UITextField(frame: CGRectMake(100, self.view.frame.size.height/1.2, self.view.frame.size.width - 120, 30))
+        self.textField = UITextField(frame: CGRectMake(100, self.view.frame.size.height/10, self.view.frame.size.width - 120, 30))
         textField.userInteractionEnabled = true
         textField.placeholder = "Search"
         textField.contentHorizontalAlignment = UIControlContentHorizontalAlignment.Left
@@ -58,26 +55,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
     }
     
-    
-    
-    
-//    override func viewWillAppear(animated: Bool) {
-//     
-//        self.startSearch = UIButton(frame: CGRectMake(0, self.view.frame.size.height/2, 130, 100))
-//        startSearch.setTitle("Search", forState: .Normal)
-//        startSearch.setTitleColor(UIColor.blackColor(), forState: .Normal)
-//        startSearch.addTarget(self, action:#selector(startSearchPressed), forControlEvents: .TouchUpInside)
-//        startSearch.backgroundColor = UIColor.yellowColor()
-//        self.view.addSubview(self.startSearch)
-//        view.bringSubviewToFront(self.startSearch)
-//        
-//
-//        
-//        
-//    }
-    
-    
-    
+
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         var locValue:CLLocationCoordinate2D = manager.location!.coordinate
         print("locations = \(locValue.latitude) \(locValue.longitude)")
@@ -95,8 +73,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
         let marker = GMSMarker()
         marker.position = CLLocationCoordinate2DMake(lattitude, longitude)
-        marker.title = "Sydney"
-        marker.snippet = "Australia"
+        marker.title = "Current Location"
+        marker.snippet = ""
         marker.map = mapView
         
         locationManager.stopUpdatingLocation()
@@ -108,8 +86,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         self.view.addSubview(self.startSearch)
 
         self.view.addSubview(self.textField)
-//        view.bringSubviewToFront(self.textField)
-//        view.bringSubviewToFront(self.startSearch)
+
         
     }
     
@@ -122,6 +99,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 
     func startSearchPressed(sender: UIButton)
     {
+        
         print("button pressed")
         searchQuery()
         
@@ -131,21 +109,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     
     func searchQuery() {
-      
-        let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/textsearch/json?query=bars&location=40.69644324,-73.94949604&radius=500&key=AIzaSyAWV1BUFv_vcedYroVrY7DWYuIxcHaqrv0")
-        
-        
-        
-//        dataTask = defaultSession.dataTaskWithURL(url!) {
-//            data, response, error in
-//            let json: AnyObject?
-        
+        self.mapView.clear()
+        let searchSt = self.textField.text!
+        self.arrayWithMarkerObjects.removeAll()
+        print(searchSt)
+        let url = NSURL(string: "https://maps.googleapis.com/maps/api/place/textsearch/json?query=\(searchSt)&location=40.69644324,-73.94949604&radius=500&key=AIzaSyAWV1BUFv_vcedYroVrY7DWYuIxcHaqrv0")
         
         self.dataTask = defaultSesion.dataTaskWithURL(url!) {
             data, response, error in
 //            print(response)
             let json : AnyObject?
-            
             do {
                 
                 json = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)
@@ -194,22 +167,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
                                 markerObject.longitude = y
                                 print(markerObject.longitude)
                             }
-                            
 //                            var x  = loc["lat"]
 //                            var y  = loc["lng"]
 //                            markerObject.lattitude = x
 //                            markerObject.longitude = y
 //                            print("lattitude is \(x) and longitude is \(y)")
                         }
-
                      }
                         self.arrayWithMarkerObjects.append(markerObject)
                         print(self.arrayWithMarkerObjects[0].lattitude)
-
                     }
-
                 }
-                
             }
             catch {
                 print("\(error)")
@@ -218,16 +186,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
             dispatch_async(dispatch_get_main_queue())
             {
+                self.mapView.clear()
                 self.createMarkers()
             }
-            
-            
         }
-        
-   
         dataTask?.resume()
-        
-        
     } // end function here
     
     
@@ -235,7 +198,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
     
     func createMarkers() {
         
-        // marker desc. 
+        self.mapView.clear()
+        arrayP.removeAll()
         print(self.arrayWithMarkerObjects)
         for i  in 0 ..< self.arrayWithMarkerObjects.count {
 //            let marker = GMSMarker()
@@ -243,11 +207,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
 //            marker.title = markerObj.name
 //            marker.snippet = markerObj.address
 //            marker.map = self.mapView
-            
+            print(self.arrayWithMarkerObjects.count)
 
-            
-            print(self,arrayWithMarkerObjects[i].lattitude)
-            print(self,arrayWithMarkerObjects[i].longitude)
+//            
+//            print(self,arrayWithMarkerObjects[i].lattitude)
+//            print(self,arrayWithMarkerObjects[i].longitude)
 //            print(self,arrayWithMarkerObjects[i].name)
 //            print(self,arrayWithMarkerObjects[i].address)
             var markerS = PlaceMarker(latitude: self.arrayWithMarkerObjects[i].lattitude, longitude: self.arrayWithMarkerObjects[i].longitude, name: self.arrayWithMarkerObjects[i].name, address: self.arrayWithMarkerObjects[i].address!!)
@@ -265,7 +229,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDel
         
 
         print("done")
-        
     }
     
     
